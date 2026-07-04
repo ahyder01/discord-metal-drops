@@ -1,47 +1,38 @@
 const { google } = require('googleapis');
 
-const GENRES = [
-  { term: 'metalcore band',          label: 'Metalcore' },
-  { term: 'deathcore band',          label: 'Deathcore' },
-  { term: 'hardcore punk band',      label: 'Hardcore' },
-  { term: 'post-hardcore band',      label: 'Post-Hardcore' },
-  { term: 'melodic metalcore band',  label: 'Melodic Metalcore' },
-  { term: 'beatdown hardcore band',  label: 'Beatdown Hardcore' },
-  { term: 'mathcore band',           label: 'Mathcore' },
+const LABELS = [
+  { name: 'Sumerian Records',    id: 'UCAtlZO9a52JIhQRyXDRLaZQ' },
+  { name: 'Rise Records',        id: 'UCxnS0WDBVfBnTP2e97DYDSA' },
+  { name: 'SharpTone Records',   id: 'UC4JNkNxIB9u2Yihx7lTZA5Q' },
+  { name: 'Fearless Records',    id: 'UCKMYrg58k3muz90hG0OSVhA' },
+  { name: 'Nuclear Blast',       id: 'UCoxg3Kml41wE3IPq-PC-LQw' },
+  { name: 'Century Media',       id: 'UCnK9PxMozTYs8ELOvgMNKFA' },
+  { name: 'UNFD',                id: 'UCST_KTjlK574mzXHDan7-_Q' },
+  { name: 'Solid State Records', id: 'UCIAgiNh4buO61TFA2dJAVzw' },
+  { name: 'Pure Noise Records',  id: 'UCC7ElkFVK3m03gEMfaq6Ung' },
+  { name: 'Hopeless Records',    id: 'UCToUNe4i9j_SlKGFl8MrQHg' },
+  { name: 'Unique Leader',       id: 'UC-6umqcTBkl9IH4Z8Z-O1jg' },
+  { name: 'Epitaph Records',     id: 'UCDE5Ezmxq1bNVak4lmkpCMw' },
+  { name: 'Artery Recordings',   id: 'UC-7XDs60YgKNyWq2S7rUtmg' },
+  { name: 'Better Noise Music',  id: 'UCqh8RdUfSR9lGyasBhM_bjA' },
 ];
 
-// Block titles that match any of these
 const BLOCK = new RegExp(
   [
-    // Reactions / commentary
     'react(ion)?', 'ranking', 'top\\s*\\d+', 'drama', 'beef',
-    // Educational / non-release
-    'lesson', 'tutorial', 'how[-\\s]?to', 'tab(s)?', 'playthrough',
+    'lesson', 'tutorial', 'how[-\\s]?to', 'playthrough',
     'drum\\s+(cover|cam)', 'guitar\\s+(cover|lesson)', 'bass\\s+(cover|lesson)',
-    // Covers & fan content
     'cover', 'fan[-\\s]?made', 'unofficial',
-    // Remixes / edits
-    'remix', 'rmx', 'rework', 'bootleg', 'mashup', 'flip\\s+by',
-    // Audio manipulation
-    'slowed', 'reverb', 'sped[-\\s]?up', 'speed[-\\s]?up',
-    'nightcore', '8d\\s*audio', 'bass[-\\s]?boost',
-    // AI music generators
-    'suno', 'udio', 'ai[-\\s]?generat', 'ai[-\\s]?(cover|version|music|song|band)',
-    'a\\.i\\.[-\\s]?(cover|version|music|song|band)',
+    'remix', 'rmx', 'rework', 'bootleg', 'mashup',
+    'slowed', 'reverb', 'sped[-\\s]?up', 'nightcore', '8d\\s*audio',
+    'suno', 'udio', 'ai[-\\s]?generat', 'ai[-\\s]?(cover|version|music|song)',
     'artificial\\s+intelligence',
-    // Live recordings
-    'live\\s+(at|from|@)', '\\blive\\s+\\d{4}', 'full\\s+concert', 'concert\\s+film',
-    // Misc low quality
-    'lyric(s)?[-\\s]video', 'playlist', 'mixtape', 'compilation',
-    'acoustic\\s+version', 'unplugged',
-    // Wrong genre / hip-hop crossover
-    'hip[-\\s]?hop', 'type\\s+beat', '\\brap\\b', '\\bdrill\\b', '\\btrap\\b',
-    'freestyle', 'diss\\s+track',
+    'live\\s+(at|from|@)', '\\blive\\s+\\d{4}', 'full\\s+concert',
+    'lyric(s)?[-\\s]video', 'playlist', 'compilation',
   ].map(p => `(?:${p})`).join('|'),
   'i',
 );
 
-// Minimum track length in seconds — filters out Shorts and clips
 const MIN_SECONDS = 90;
 
 function parseDuration(iso) {
@@ -56,17 +47,14 @@ async function fetchNewTracks(apiKey, hoursBack = 26) {
 
   const seen = new Map();
 
-  for (const genre of GENRES) {
+  for (const label of LABELS) {
     const res = await youtube.search.list({
       part: ['snippet'],
-      // Exclusions in the query help before we even filter locally
-      q: `"${genre.term}" (official audio OR official video OR new single OR new song) -remix -cover -rap -"hip hop" -"type beat"`,
+      channelId: label.id,
       type: ['video'],
-      videoCategoryId: '10', // Music
-      videoDuration: 'medium', // 4–20 min — excludes Shorts automatically
       publishedAfter,
       order: 'date',
-      maxResults: 25,
+      maxResults: 10,
     });
 
     for (const item of res.data.items || []) {
@@ -83,7 +71,7 @@ async function fetchNewTracks(apiKey, hoursBack = 26) {
             item.snippet.thumbnails?.medium?.url ||
             item.snippet.thumbnails?.default?.url,
           url: `https://www.youtube.com/watch?v=${id}`,
-          genre: genre.label,
+          label: label.name,
         });
       }
     }
@@ -91,20 +79,15 @@ async function fetchNewTracks(apiKey, hoursBack = 26) {
 
   if (seen.size === 0) return [];
 
-  // Batch-fetch durations to drop anything under MIN_SECONDS (catches anything
-  // videoDuration:'medium' missed, e.g. 2-minute interludes)
+  // Filter out Shorts / clips by duration
   const ids = [...seen.keys()];
   const chunks = [];
   for (let i = 0; i < ids.length; i += 50) chunks.push(ids.slice(i, i + 50));
 
   for (const chunk of chunks) {
-    const detail = await youtube.videos.list({
-      part: ['contentDetails'],
-      id: chunk,
-    });
+    const detail = await youtube.videos.list({ part: ['contentDetails'], id: chunk });
     for (const v of detail.data.items || []) {
-      const secs = parseDuration(v.contentDetails.duration);
-      if (secs < MIN_SECONDS) seen.delete(v.id);
+      if (parseDuration(v.contentDetails.duration) < MIN_SECONDS) seen.delete(v.id);
     }
   }
 
@@ -113,4 +96,4 @@ async function fetchNewTracks(apiKey, hoursBack = 26) {
   );
 }
 
-module.exports = { fetchNewTracks };
+module.exports = { fetchNewTracks, LABELS };

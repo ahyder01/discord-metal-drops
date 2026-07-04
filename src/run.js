@@ -3,14 +3,21 @@ const { WebhookClient, EmbedBuilder } = require('discord.js');
 const { fetchNewTracks } = require('./youtube');
 const { hasBeenPosted, markAsPosted, cleanup } = require('./db');
 
-const GENRE_COLORS = {
-  'Metalcore':         0xe74c3c,
-  'Deathcore':         0x8b0000,
-  'Hardcore':          0xff6600,
-  'Post-Hardcore':     0x9b59b6,
-  'Melodic Metalcore': 0x3498db,
-  'Beatdown Hardcore': 0xff4500,
-  'Mathcore':          0x1abc9c,
+const LABEL_COLORS = {
+  'Sumerian Records':    0xe74c3c,
+  'Rise Records':        0x3498db,
+  'SharpTone Records':   0x2ecc71,
+  'Fearless Records':    0xf39c12,
+  'Nuclear Blast':       0x8b0000,
+  'Century Media':       0x9b59b6,
+  'UNFD':                0x1abc9c,
+  'Solid State Records': 0xe67e22,
+  'Pure Noise Records':  0x16a085,
+  'Hopeless Records':    0xd35400,
+  'Unique Leader':       0x2c3e50,
+  'Epitaph Records':     0x7f8c8d,
+  'Artery Recordings':   0xc0392b,
+  'Better Noise Music':  0x8e44ad,
 };
 
 const MAX_PER_RUN = 15;
@@ -62,10 +69,10 @@ async function main() {
           .setAuthor({ name: track.channel })
           .setThumbnail(track.thumbnail)
           .addFields(
-            { name: 'Genre',    value: track.genre,          inline: true },
+            { name: 'Label',    value: track.label,          inline: true },
             { name: 'Released', value: `<t:${tsSeconds}:R>`, inline: true },
           )
-          .setColor(GENRE_COLORS[track.genre] ?? 0xff4500),
+          .setColor(LABEL_COLORS[track.label] ?? 0xff4500),
       ],
     });
 
