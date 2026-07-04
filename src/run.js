@@ -45,14 +45,14 @@ async function main() {
   }
 
   const HEADERS = [
-    `the labels have been busy. your ears have been warned`,
-    `fresh from the pits of the internet`,
-    `another week, another reason to scare your neighbours`,
-    `this week's damage report`,
-    `drop everything. no seriously, drop it`,
-    `new music just dropped and it's heavy`,
-    `your neck will thank you later`,
-    `good luck explaining these to your family`,
+    `something dropped this week and it wasn't your phone`,
+    `bands were in the studio. now they're in your ears`,
+    `freshly uploaded, still warm`,
+    `new arrivals. no returns.`,
+    `consider your weekend sorted`,
+    `the weekly haul is in`,
+    `this week in riffs`,
+    `someone had a productive week`,
   ];
 
   const title = HEADERS[Math.floor(Math.random() * HEADERS.length)];
