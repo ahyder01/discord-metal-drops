@@ -41,7 +41,7 @@ function parseDuration(iso) {
   return (parseInt(m[1] || 0) * 3600) + (parseInt(m[2] || 0) * 60) + parseInt(m[3] || 0);
 }
 
-async function fetchNewTracks(apiKey, hoursBack = 26) {
+async function fetchNewTracks(apiKey, hoursBack = 168) {
   const youtube = google.youtube({ version: 'v3', auth: apiKey });
   const publishedAfter = new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString();
 

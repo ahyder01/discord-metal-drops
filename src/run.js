@@ -20,7 +20,7 @@ const LABEL_COLORS = {
   'Better Noise Music':  0x8e44ad,
 };
 
-const MAX_PER_RUN = 15;
+const MAX_PER_RUN = 30;
 
 async function main() {
   const { YOUTUBE_API_KEY, DISCORD_WEBHOOK_URL } = process.env;
