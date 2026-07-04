@@ -1,13 +1,13 @@
 const { google } = require('googleapis');
 
 const GENRES = [
-  { term: 'metalcore',          label: 'Metalcore' },
-  { term: 'deathcore',          label: 'Deathcore' },
-  { term: 'hardcore',           label: 'Hardcore' },
-  { term: 'post-hardcore',      label: 'Post-Hardcore' },
-  { term: 'melodic metalcore',  label: 'Melodic Metalcore' },
-  { term: 'beatdown hardcore',  label: 'Beatdown Hardcore' },
-  { term: 'mathcore',           label: 'Mathcore' },
+  { term: 'metalcore band',          label: 'Metalcore' },
+  { term: 'deathcore band',          label: 'Deathcore' },
+  { term: 'hardcore punk band',      label: 'Hardcore' },
+  { term: 'post-hardcore band',      label: 'Post-Hardcore' },
+  { term: 'melodic metalcore band',  label: 'Melodic Metalcore' },
+  { term: 'beatdown hardcore band',  label: 'Beatdown Hardcore' },
+  { term: 'mathcore band',           label: 'Mathcore' },
 ];
 
 // Block titles that match any of these
@@ -34,6 +34,9 @@ const BLOCK = new RegExp(
     // Misc low quality
     'lyric(s)?[-\\s]video', 'playlist', 'mixtape', 'compilation',
     'acoustic\\s+version', 'unplugged',
+    // Wrong genre / hip-hop crossover
+    'hip[-\\s]?hop', 'type\\s+beat', '\\brap\\b', '\\bdrill\\b', '\\btrap\\b',
+    'freestyle', 'diss\\s+track',
   ].map(p => `(?:${p})`).join('|'),
   'i',
 );
@@ -57,7 +60,7 @@ async function fetchNewTracks(apiKey, hoursBack = 26) {
     const res = await youtube.search.list({
       part: ['snippet'],
       // Exclusions in the query help before we even filter locally
-      q: `"${genre.term}" (official audio OR official video OR new single OR new song) -remix -cover`,
+      q: `"${genre.term}" (official audio OR official video OR new single OR new song) -remix -cover -rap -"hip hop" -"type beat"`,
       type: ['video'],
       videoCategoryId: '10', // Music
       videoDuration: 'medium', // 4–20 min — excludes Shorts automatically
