@@ -45,14 +45,14 @@ async function main() {
   }
 
   const HEADERS = [
-    `your weekly reminder that silence is for the weak`,
     `the labels have been busy. your ears have been warned`,
     `fresh from the pits of the internet`,
     `another week, another reason to scare your neighbours`,
-    `your algorithm doesn't know about these. we do`,
     `this week's damage report`,
     `drop everything. no seriously, drop it`,
-    `for those who skipped the pop charts`,
+    `new music just dropped and it's heavy`,
+    `your neck will thank you later`,
+    `good luck explaining these to your family`,
   ];
 
   const title = HEADERS[Math.floor(Math.random() * HEADERS.length)];
