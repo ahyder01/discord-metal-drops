@@ -2,32 +2,26 @@ name: Daily Metal Drops
 
 on:
   schedule:
-    - cron: '0 9 * * *'   # 9:00 AM UTC every day
-  workflow_dispatch:        # Lets you trigger a manual run from GitHub any time
+    - cron: '0 9 * * *'
+  workflow_dispatch:
 
 jobs:
   post-tracks:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # Needed to commit posted.json back so we don't repost
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm install
 
       - name: Run scanner
         env:
