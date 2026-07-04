@@ -44,15 +44,24 @@ async function main() {
     return;
   }
 
-  const dateStr = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
+  const HEADERS = [
+    `your weekly reminder that silence is for the weak`,
+    `the labels have been busy. your ears have been warned`,
+    `fresh from the pits of the internet`,
+    `another week, another reason to scare your neighbours`,
+    `your algorithm doesn't know about these. we do`,
+    `this week's damage report`,
+    `drop everything. no seriously, drop it`,
+    `for those who skipped the pop charts`,
+  ];
+
+  const title = HEADERS[Math.floor(Math.random() * HEADERS.length)];
 
   await webhook.send({
     embeds: [
       new EmbedBuilder()
-        .setTitle(`🤘 New Metal Drops — ${dateStr}`)
-        .setDescription(`**${fresh.length}** fresh track${fresh.length !== 1 ? 's' : ''} across metalcore, deathcore, hardcore & more.`)
+        .setTitle(`🤘 ${fresh.length} new track${fresh.length !== 1 ? 's' : ''} this week`)
+        .setDescription(`*${title}*`)
         .setColor(0x1a1a1a)
         .setTimestamp(),
     ],
