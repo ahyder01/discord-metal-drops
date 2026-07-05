@@ -35,6 +35,15 @@ const BLOCK = new RegExp(
 
 const MIN_SECONDS = 90;
 
+function decodeHtml(str) {
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
 function parseDuration(iso) {
   const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!m) return 0;
@@ -59,7 +68,7 @@ async function fetchNewTracks(apiKey, hoursBack = 168) {
 
     for (const item of res.data.items || []) {
       const id = item.id.videoId;
-      const title = item.snippet.title;
+      const title = decodeHtml(item.snippet.title);
       if (!seen.has(id) && !BLOCK.test(title)) {
         seen.set(id, {
           id,
